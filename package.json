@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "@layerzerolabs/devtools": "^2.0.1",
+    "@layerzerolabs/oapp-evm": "^0.3.2",
+    "@layerzerolabs/toolbox-foundry": "^0.1.13"
+  }
+}
