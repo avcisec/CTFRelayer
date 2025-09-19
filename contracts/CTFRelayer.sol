@@ -148,4 +148,9 @@ contract CTFRelayer is OApp, OAppOptionsType3, ICTFRelayer {
         return fee.nativeFee;
     }
 
+    function getReportPayoutsFee(uint32 _dstEid,bytes32 _questionId, uint[] calldata _payouts, bytes calldata _options, bool _payInLzToken) public view returns (uint256 nativeFee) {
+        MessagingFee memory fee = quoteReportPayouts(_dstEid,_questionId,_payouts,_options,_payInLzToken);
+        return fee.nativeFee;
+    }
+
 }

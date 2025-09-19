@@ -26,5 +26,7 @@ interface ICTFRelayer {
 
     function prepareCondition(uint32 _dstEid, bytes32 _questionId, uint8 _outcomeSlotCount, bytes calldata _options) external payable;
     function reportPayouts(uint32 _dstEid, bytes32 _questionId, uint[] calldata _payouts, bytes calldata _options) external payable;
+    function getPrepareConditionFee(uint32 _dstEid, bytes32 _questionId, uint8 _outcomeSlotCount, bytes calldata _options, bool _payInLzToken) external view returns (uint256 nativeFee);
+    function getReportPayoutsFee(uint32 _dstEid, bytes32 _questionId, uint[] calldata _payouts, bytes calldata _options, bool _payInLzToken) external view returns (uint256 nativeFee);
 
 }
