@@ -99,7 +99,31 @@ contract CTFRelayer is OApp, OAppOptionsType3, ICTFRelayer {
         if (outcomeSlotCount > 0) return true; 
     }
 
+    /// @notice Quote the prepareCondition fee
+    /// @param _questionId The question ID
+    /// @param _outcomeSlotCount The outcome slot count
+    /// @param _options The options
+    /// @param _payInLzToken The pay in LZ token
+    /// @return fee The fee
+    function quotePrepareCondition(uint32 _dstEid, bytes32 _questionId, uint8 _outcomeSlotCount, bytes calldata _options, bool _payInLzToken) public view returns (MessagingFee memory fee) {
+        
+        // Quote cross-chain message
+        PrepareConditionMessage memory _message = PrepareConditionMessage({
+            questionId: _questionId,
+            outcomeSlotCount: _outcomeSlotCount
+        });
+        bytes memory _payload = abi.encode(Action.PrepareCondition,abi.encode(_message));
+
+        // Use provided options or create default
+        bytes memory options = _options.length > 0 ? _options : 
+            OptionsBuilder.newOptions().addExecutorLzReceiveOption(200000, 0);
+
+        fee = _quote(_dstEid, _payload, options, _payInLzToken);
+    }
+    
+
     /********** Getter Functions **********/
+
 
 
 }
