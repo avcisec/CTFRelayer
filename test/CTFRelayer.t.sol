@@ -95,10 +95,6 @@ contract LzOperationsTest is TestHelperOz5 {
 
         uint256 userBalanceAfter = userA.balance;
         assertEq(userBalanceBefore - userBalanceAfter, quotefee.nativeFee);
-        console2.log("Native Fee quoted:", quotefee.nativeFee);
-        console2.log("Native Fee paid:", userBalanceBefore - userBalanceAfter);
-
-
     }
 
     /********** ReportPayouts Tests **********/
@@ -148,13 +144,23 @@ contract LzOperationsTest is TestHelperOz5 {
 
 
     function test_reportPayoutsAfterPrepareCondition() public {
-     test_prepareCondition();
-     bytes memory options = OptionsBuilder.newOptions().addExecutorLzReceiveOption(200000, 0);
-     MessagingFee memory fee = lzSender.quoteReportPayouts(bEid,questionId, payouts, options, false);
-     vm.prank(userA);
-     lzSender.reportPayouts{value: fee.nativeFee}(bEid,questionId, payouts, options);
-     verifyPackets(bEid, addressToBytes32(address(lzReceiver)));
+        uint outcomeSlotCountBefore = conditionalTokens.getOutcomeSlotCount(conditionalTokens.getConditionId(address(lzReceiver), questionId, outcomeSlotCount));
+        test_prepareCondition();
+        bytes memory options = OptionsBuilder.newOptions().addExecutorLzReceiveOption(200000, 0);
+        MessagingFee memory fee = lzSender.quoteReportPayouts(bEid,questionId, payouts, options, false);
+        vm.prank(userA);
+        lzSender.reportPayouts{value: fee.nativeFee}(bEid,questionId, payouts, options);
+        uint outcomeSlotCountAfter = conditionalTokens.getOutcomeSlotCount(conditionalTokens.getConditionId(address(lzReceiver), questionId, outcomeSlotCount));
+        assertEq(outcomeSlotCountBefore,0);
+        assert(outcomeSlotCountAfter > 0);
+        verifyPackets(bEid, addressToBytes32(address(lzReceiver)));
 
+    }
+
+    function test_reportPayoutOnCTWithoutPreparing() public {
+        vm.prank(userA);
+        vm.expectRevert("condition not prepared or found");
+        conditionalTokens.reportPayouts(questionId,payouts);
     }
 
 
