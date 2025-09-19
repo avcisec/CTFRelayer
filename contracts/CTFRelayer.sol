@@ -99,4 +99,7 @@ contract CTFRelayer is OApp, OAppOptionsType3, ICTFRelayer {
         if (outcomeSlotCount > 0) return true; 
     }
 
+    /********** Getter Functions **********/
+
+
 }
