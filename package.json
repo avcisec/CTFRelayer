@@ -2,6 +2,7 @@
   "dependencies": {
     "@layerzerolabs/devtools": "^2.0.1",
     "@layerzerolabs/oapp-evm": "^0.3.2",
+    "@layerzerolabs/test-devtools-evm-foundry": "^7.0.0",
     "@layerzerolabs/toolbox-foundry": "^0.1.13"
   }
 }
