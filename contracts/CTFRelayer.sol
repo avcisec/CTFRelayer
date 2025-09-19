@@ -85,7 +85,6 @@ contract CTFRelayer is OApp, OAppOptionsType3, ICTFRelayer {
             CTF.prepareCondition(message.questionId, message.outcomeSlotCount);
         } else if (action == Action.ReportPayouts) {
             ReportPayoutsMessage memory message = abi.decode(data, (ReportPayoutsMessage));
-            require(!_conditionPrepared(message.questionId), "Condition Not Prepared.");
             CTF.reportPayouts(message.questionId,message.payouts);
         }
     }

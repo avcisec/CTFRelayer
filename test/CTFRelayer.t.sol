@@ -3,7 +3,7 @@ pragma solidity 0.8.22;
 
 
 import { Test, console2 } from "forge-std/Test.sol";
-import { CTFRelayer,MessagingFee } from "../../contracts/CTFRelayer.sol";
+import { CTFRelayer,MessagingFee } from "contracts/CTFRelayer.sol";
 
 import { IOAppOptionsType3, EnforcedOptionParam } from "@layerzerolabs/oapp-evm/contracts/oapp/libs/OAppOptionsType3.sol";
 import { OptionsBuilder } from "@layerzerolabs/oapp-evm/contracts/oapp/libs/OptionsBuilder.sol";
@@ -103,7 +103,59 @@ contract LzOperationsTest is TestHelperOz5 {
 
     /********** ReportPayouts Tests **********/
 
-    
+
+    function test_quoteReportPayouts() public {
+        // prepare a condition
+        test_prepareCondition();
+
+        // build options
+        bytes memory options = OptionsBuilder.newOptions().addExecutorLzReceiveOption(200000, 0);
+
+        // set the payInLzToken boolean
+        bool payInLzToken = false;
+
+        // check the messaging fee
+        MessagingFee memory fee = lzSender.quoteReportPayouts(bEid, questionId, payouts, options, payInLzToken);
+
+        // pay 1 eth for messaging and layerZero will payback the rest.
+        vm.prank(userA);
+        uint256 userBalanceBefore = userA.balance;
+        lzSender.reportPayouts{value: 1 ether}(bEid,questionId, payouts, options);
+        uint256 userBalanceAfter = userA.balance;
+        // check if quoteReportPayouts fee == fee paid by user
+        assertEq(userBalanceBefore - userBalanceAfter, fee.nativeFee);
+    }
+
+
+    function test_ReportPayoutWithoutPreparing() public {
+        // build options
+        bytes memory options = OptionsBuilder.newOptions().addExecutorLzReceiveOption(200000, 0);
+
+        // set the payInLzToken boolean
+        bool payInLzToken = false;
+
+        //check the messaging fee
+        MessagingFee memory fee = lzSender.quoteReportPayouts(bEid,questionId, payouts, options, payInLzToken);
+
+        vm.prank(userA);
+        uint outcomeSlotCountBefore = conditionalTokens.getOutcomeSlotCount(conditionalTokens.getConditionId(address(lzReceiver), questionId, outcomeSlotCount));
+        lzSender.reportPayouts{value: fee.nativeFee}(bEid,questionId, payouts, options);
+        uint outcomeSlotCountAfter = conditionalTokens.getOutcomeSlotCount(conditionalTokens.getConditionId(address(lzReceiver), questionId, outcomeSlotCount));
+        assertEq(outcomeSlotCountBefore,0); // condition hasn't prepared.
+        assertEq(outcomeSlotCountAfter,0); // condition not resolved because doesn't exist. 
+
+    }
+
+
+    function test_reportPayoutsAfterPrepareCondition() public {
+     test_prepareCondition();
+     bytes memory options = OptionsBuilder.newOptions().addExecutorLzReceiveOption(200000, 0);
+     MessagingFee memory fee = lzSender.quoteReportPayouts(bEid,questionId, payouts, options, false);
+     vm.prank(userA);
+     lzSender.reportPayouts{value: fee.nativeFee}(bEid,questionId, payouts, options);
+     verifyPackets(bEid, addressToBytes32(address(lzReceiver)));
+
+    }
 
 
 }
