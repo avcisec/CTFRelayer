@@ -124,6 +124,9 @@ contract CTFRelayer is OApp, OAppOptionsType3, ICTFRelayer {
 
     /********** Getter Functions **********/
 
-
+    function getPrepareConditionFee(uint32 _dstEid, bytes32 _questionId, uint8 _outcomeSlotCount, bytes calldata _options, bool _payInLzToken) public view returns (uint256 nativeFee) {
+        MessagingFee memory fee = quotePrepareCondition(_dstEid,_questionId,_outcomeSlotCount,_options,_payInLzToken);
+        return fee.nativeFee;
+    }
 
 }
