@@ -91,13 +91,6 @@ contract CTFRelayer is OApp, OAppOptionsType3, ICTFRelayer {
 
     /********** View & Pure Functions **********/
 
-    function _conditionPrepared(bytes32 _questionId) internal view returns (bool prepared) {
-        bytes32 conditionId = CTF.getConditionId(address(this), _questionId, 2);
-        uint outcomeSlotCount = CTF.getOutcomeSlotCount(conditionId);
-        if (outcomeSlotCount == 0) return false;
-        if (outcomeSlotCount > 0) return true; 
-    }
-
     /// @notice Quote the prepareCondition fee
     /// @param _questionId The question ID
     /// @param _outcomeSlotCount The outcome slot count
